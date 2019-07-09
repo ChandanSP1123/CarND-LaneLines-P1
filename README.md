@@ -1,56 +1,56 @@
 # **Finding Lane Lines on the Road** 
-[![Udacity - Self-Driving Car NanoDegree](https://s3.amazonaws.com/udacity-sdc/github/shield-carnd.svg)](http://www.udacity.com/drive)
-
-<img src="examples/laneLines_thirdPass.jpg" width="480" alt="Combined Image" />
-
-Overview
----
-
-When we drive, we use our eyes to decide where to go.  The lines on the road that show us where the lanes are act as our constant reference for where to steer the vehicle.  Naturally, one of the first things we would like to do in developing a self-driving car is to automatically detect lane lines using an algorithm.
-
-In this project you will detect lane lines in images using Python and OpenCV.  OpenCV means "Open-Source Computer Vision", which is a package that has many useful tools for analyzing images.  
-
-To complete the project, two files will be submitted: a file containing project code and a file containing a brief write up explaining your solution. We have included template files to be used both for the [code](https://github.com/udacity/CarND-LaneLines-P1/blob/master/P1.ipynb) and the [writeup](https://github.com/udacity/CarND-LaneLines-P1/blob/master/writeup_template.md).The code file is called P1.ipynb and the writeup template is writeup_template.md 
-
-To meet specifications in the project, take a look at the requirements in the [project rubric](https://review.udacity.com/#!/rubrics/322/view)
 
 
-Creating a Great Writeup
----
-For this project, a great writeup should provide a detailed response to the "Reflection" section of the [project rubric](https://review.udacity.com/#!/rubrics/322/view). There are three parts to the reflection:
 
-1. Describe the pipeline
+### 1. Pipeline Creation on static image
 
-2. Identify any shortcomings
+My pipeline for static image consisted of below steps
+ 
+1. Convert the image to Gray Scale using cvtColor function
 
-3. Suggest possible improvements
+2. Applied the canny edge detection using the canny function with (255/3 and 255/2 as low and high treshold respectively)
 
-We encourage using images in your writeup to demonstrate how your pipeline works.  
+3. A polygon is defined to identify the region of interest such that the lane region is covered
 
-All that said, please be concise!  We're not looking for you to write a book here: just a brief description.
+4. Then the image is sent to Hough transform to obtain the lines from the image
 
-You're not required to use markdown for your writeup.  If you use another method please just submit a pdf of your writeup. Here is a link to a [writeup template file](https://github.com/udacity/CarND-LaneLines-P1/blob/master/writeup_template.md). 
+5. Then Draw line function was used to draw the Red lines on the lanes identified and also to extrapolate the lines where the lane is not continous
+
+from the array of lines in the image, slope of the lines are calculated . if the slope is less than 0 (later made as 0.1 as the results for video were better) then the line is identified as left lane and right line otherwise and the sum of the slope and intecept of each line( left and right) is caluculated.
+
+Now taking bottom of image as a point in y axis and using the mean of slope and intercept the bottom point x is calculated 
+the second point is calculated using the silghtly higer than middle of image as a point in y axis
+
+Now for left and right lane , a line is drawn from the bottom of image as 1st point and sightly middle of the lane as second point with average slope that is determined in previous step.
+
+Below are the results of the 6 test images that were provided
 
 
-The Project
----
 
-## If you have already installed the [CarND Term1 Starter Kit](https://github.com/udacity/CarND-Term1-Starter-Kit/blob/master/README.md) you should be good to go!   If not, you should install the starter kit to get started on this project. ##
+![alt text](./Output/solidWhiteCurve.jpg?raw=true )solidWhiteCurve
+![alt text](./Output/solidWhiteRight.jpg?raw=true )solidWhiteRight
+![alt text](./Output/solidYellowCurve.jpg?raw=true )solidYellowCurve
+![alt text](./Output/solidYellowCurve2.jpg?raw=true )solidYellowCurve2
+![alt text](./Output/solidYellowLeft.jpg?raw=true )solidYellowLeft
+![alt text](./Output/whiteCarLaneSwitch.jpg?raw=true )whiteCarLaneSwitch
 
-**Step 1:** Set up the [CarND Term1 Starter Kit](https://github.com/udacity/CarND-Term1-Starter-Kit/blob/master/README.md) if you haven't already.
+the above image inupt were then provided to Video inputs solidWhiteRight.mp4 and solidYellowLeft.mp4 , the result was lanes were drawn but there were some stray line getting generated . this behaviour was high in challenge.mp4 video
 
-**Step 2:** Open the code in a Jupyter Notebook
+So the slope range was fixed between 0.45 to 0.85 to draw the lane and avoid the stray lines
 
-You will complete the project code in a Jupyter notebook.  If you are unfamiliar with Jupyter Notebooks, check out [Udacity's free course on Anaconda and Jupyter Notebooks](https://classroom.udacity.com/courses/ud1111) to get started.
+The final Video Output is Present in Output folder of this Notebook 
+1. ![solidWhiteRight.mp4](./Output/solidWhiteRight.mp4)
+2. ![solidYellowLeft.mp4](./Output/solidYellowLeft.mp4)
+3. ![Challenge.mp4](./Output/challenge.mp4)
 
-Jupyter is an Ipython notebook where you can run blocks of code and see results interactively.  All the code for this project is contained in a Jupyter notebook. To start Jupyter in your browser, use terminal to navigate to your project directory and then run the following command at the terminal prompt (be sure you've activated your Python 3 carnd-term1 environment as described in the [CarND Term1 Starter Kit](https://github.com/udacity/CarND-Term1-Starter-Kit/blob/master/README.md) installation instructions!):
+### 2.Potential shortcomings with  current pipeline
 
-`> jupyter notebook`
 
-A browser window will appear showing the contents of the current directory.  Click on the file called "P1.ipynb".  Another browser window will appear displaying the notebook.  Follow the instructions in the notebook to complete the project.  
+One potential short coming would be when there is steep curve as in challenge.mp4 Video there is a failure to draw and detect lines
 
-**Step 3:** Complete the project and submit both the Ipython notebook and the project writeup
 
-## How to write a README
-A well written README file can enhance your project and portfolio.  Develop your abilities to create professional README files by completing [this free course](https://www.udacity.com/course/writing-readmes--ud777).
+
+### 3. Possible improvements to the pipeline
+
+A possible improvement would be to have variable region of interest which might address the steep curve issue  
 
